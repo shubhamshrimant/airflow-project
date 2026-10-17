@@ -7,10 +7,10 @@ from airflow.sdk import dag, task
 
 @dag(
     dag_id="retail_orders_pipeline",
-    start_date=pendulum.datetime(2026, 9, 1, tz="UTC"),
-    schedule=None,
-    catchup=False,
-    tags=["youtube", "data-engineering", "python"],
+    start_date=pendulum.datetime(2026, 10, 10, tz="Asia/Kolkata"),
+    schedule=None, # Set to None for manual trigger
+    catchup=False, # Set to False to avoid backfilling
+    tags=["data-engineering-demo", "retail-orders"],
 )
 def retail_orders_pipeline():
 
