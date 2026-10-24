@@ -67,7 +67,8 @@ flowchart LR
     Create -. task dependency .-> Load
     Create -. creates table .-> Staging
     Load -->|upsert rows| Staging
-    Staging --> Transform
+    Load -->|XCom: upserted row count| Transform
+    Staging -. source data .-> Transform
     Transform --> Analytics
     Analytics --> Report
 ```
@@ -75,7 +76,10 @@ flowchart LR
 The task order is create staging table, load/upsert CSV rows, rebuild analytics,
 then report row count and revenue. Airflow tasks connect to the business
 database using the Airflow connection ID `retail_postgres` and Docker hostname
-`retail-postgres`.
+`retail-postgres`. The load task returns its upserted row count, which TaskFlow
+passes to the transform task through XCom. Inspect the transform task's log to
+see the received count; only this small metadata value is exchanged, not the
+order records themselves.
 
 `dags/sql/create_analytics_table.sql` is present in the project, but the DAG
 currently creates `analytics_orders` through `transform_orders.sql` instead.

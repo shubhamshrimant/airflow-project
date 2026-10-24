@@ -6,7 +6,7 @@ import csv
 from pathlib import Path
 
 import pendulum
-from airflow.sdk import dag, task
+from airflow.sdk import Variable, dag, task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 
@@ -16,11 +16,11 @@ POSTGRES_CONN_ID = "retail_postgres"
 
 @dag(
     dag_id="retail_orders_postgres_pipeline",
-    description="Load retail orders from CSV into PostgreSQL and transform with SQL",
+    description="Load retail orders from CSV into PostgreSQL and demonstrate XCom",
     start_date=pendulum.datetime(2026, 10, 1, tz="UTC"),
     schedule=None,
     catchup=False,
-    tags=["youtube", "postgresql", "etl"],
+    tags=["youtube", "postgresql", "etl", "xcom"],
 )
 def retail_orders_postgres_pipeline():
 
@@ -103,26 +103,34 @@ def retail_orders_postgres_pipeline():
         return len(records)
 
     @task
-    def transform_staging_to_analytics() -> None:
+    def transform_staging_to_analytics(upserted_rows: int) -> None:
         """Rebuild the analytics table using SQL."""
         hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
         sql_file = Path("/opt/airflow/dags/sql/transform_orders.sql")
         if not sql_file.exists():
             raise FileNotFoundError(f"SQL file not found: {sql_file}")
         hook.run(sql_file.read_text(encoding="utf-8"))
+        print(f"Rebuilt analytics_orders after upserting {upserted_rows} rows")
 
     @task
     def report_row_count() -> None:
+        report_label = Variable.get(
+            "retail_report_label",
+            default="Retail report",
+        )
         hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
         count = hook.get_first("SELECT COUNT(*) FROM analytics_orders;")[0]
         revenue = hook.get_first(
             "SELECT COALESCE(SUM(order_value), 0) FROM analytics_orders;"
         )[0]
-        print(f"Analytics rows: {count}; total revenue: {revenue}")
+        print(
+            f"{report_label}: Analytics rows: {count}; "
+            f"total revenue: {revenue}"
+        )
 
     create = create_staging_table()
     loaded = extract_and_load_csv()
-    transformed = transform_staging_to_analytics()
+    transformed = transform_staging_to_analytics(loaded)
     report = report_row_count()
 
     create >> loaded >> transformed >> report
