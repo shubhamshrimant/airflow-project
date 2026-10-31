@@ -1,0 +1,7 @@
+order_id,customer_id,order_date,product,category,quantity,unit_price
+2001,C101,2026-10-10,Laptop,Electronics,1,75000
+2002,C102,2026-10-10,Mouse,Accessories,0,1200
+2003,C103,2026-10-11,Keyboard,Accessories,2,-50
+2004,,2026-10-11,Monitor,Electronics,1,18000
+2004,C104,2026-10-12,Headphones,Accessories,1,3500
+2005,C105,not-a-date,Webcam,Electronics,1,2500
