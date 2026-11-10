@@ -1,0 +1,4 @@
+order_id,customer_id,order_date,product,quantity,unit_price
+2001,IN001,2026-11-05,Laptop,1,72000
+2002,IN002,2026-11-05,Mouse,2,900
+2003,IN003,2026-11-05,Monitor,1,16000

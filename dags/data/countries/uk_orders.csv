@@ -1,0 +1,3 @@
+order_id,customer_id,order_date,product,quantity,unit_price
+4001,UK001,2026-11-05,Webcam,1,3200
+4002,UK002,2026-11-05,Microphone,1,5800

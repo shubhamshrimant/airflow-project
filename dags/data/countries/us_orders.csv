@@ -1,0 +1,3 @@
+order_id,customer_id,order_date,product,quantity,unit_price
+3001,US001,2026-11-05,Keyboard,1,4500
+3002,US002,2026-11-05,Headphones,2,6500
